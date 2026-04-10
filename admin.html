@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GENTLEMAN'S | Admin Panel</title>
+    
+    <!-- Prémiová typografie: Space Grotesk pro nadpisy, Inter pro texty -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', 'sans-serif'],
+                        heading: ['"Space Grotesk"', 'sans-serif'],
+                    },
+                    colors: {
+                        bg: '#000000',
+                        surface: '#0a0a0a',
+                        border: '#222222',
+                        accent: '#ffffff',
+                        muted: '#888888'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html { background-color: #000000; color: #fff; }
+        body { -webkit-font-smoothing: antialiased; }
+
+        /* Detailní tečkovaný grid pro admin panel */
+        .bg-dots {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Ostré hrany a přechody */
+        .admin-card {
+            background: #050505;
+            border: 1px solid #222;
+            transition: all 0.2s ease;
+        }
+        .admin-card:hover {
+            border-color: #555;
+        }
+
+        /* Skrývání elementů přes JS */
+        .hidden-view { display: none !important; }
+
+        /* Navigační tlačítka v adminu */
+        .nav-btn {
+            border-left: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-btn.active {
+            border-color: #ffffff;
+            background: rgba(255,255,255,0.05);
+            color: #ffffff;
+        }
+
+        /* Vlastní scrollbar pro horizontální menu na mobilu */
+        ::-webkit-scrollbar { height: 4px; width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body class="min-h-screen bg-bg font-sans selection:bg-accent selection:text-black">
+    <div class="fixed inset-0 bg-dots opacity-30 pointer-events-none z-0"></div>
+
+    <!-- VÝBĚR PROFILU (Obrazovka 1) -->
+    <div id="selection-screen" class="relative z-10 min-h-screen flex flex-col justify-center p-4 md:p-8">
+        <div class="max-w-[90rem] mx-auto w-full">
+            <div class="mb-10 text-center md:text-left">
+                <span class="text-[10px] font-heading font-bold text-muted tracking-[0.3em] uppercase block mb-2">Přístup do systému</span>
+                <h1 class="text-4xl md:text-6xl font-heading font-bold text-white tracking-tighter uppercase leading-none">
+                    Vyberte Profil
+                </h1>
+            </div>
+
+            <!-- Obří dlaždice (Na mobilu 2x2 grid, na desktopu 4 vedle sebe) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 h-[60vh] md:h-[500px]">
+                
+                <div onclick="loginAs('Kdokoli')" class="admin-card relative group cursor-pointer overflow-hidden flex flex-col justify-end p-4 md:p-6">
+                    <img src="./photos/1.webp" class="absolute inset-0 w-full h-full object-cover grayscale opacity-40 group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div class="relative z-10">
+                        <span class="text-[9px] md:text-[10px] font-heading font-bold text-white uppercase tracking-[0.2em] border border-white/30 px-2 py-1 mb-3 inline-block">Nejbližší Termín</span>
+                        <h2 class="text-2xl md:text-4xl font-heading font-bold uppercase tracking-tight">Kdokoli</h2>
+                    </div>
+                </div>
+
+                <div onclick="loginAs('David')" class="admin-card relative group cursor-pointer overflow-hidden flex flex-col justify-end p-4 md:p-6">
+                    <img src="./photos/2.webp" class="absolute inset-0 w-full h-full object-cover grayscale opacity-40 group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div class="relative z-10">
+                        <span class="text-[9px] md:text-[10px] font-heading font-bold text-white uppercase tracking-[0.2em] border border-white/30 px-2 py-1 mb-3 inline-block">Master Barber</span>
+                        <h2 class="text-2xl md:text-4xl font-heading font-bold uppercase tracking-tight">David</h2>
+                    </div>
+                </div>
+
+                <div onclick="loginAs('Tomáš')" class="admin-card relative group cursor-pointer overflow-hidden flex flex-col justify-end p-4 md:p-6">
+                    <img src="./photos/3.webp" class="absolute inset-0 w-full h-full object-cover grayscale opacity-40 group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div class="relative z-10">
+                        <span class="text-[9px] md:text-[10px] font-heading font-bold text-white uppercase tracking-[0.2em] border border-white/30 px-2 py-1 mb-3 inline-block">Senior</span>
+                        <h2 class="text-2xl md:text-4xl font-heading font-bold uppercase tracking-tight">Tomáš</h2>
+                    </div>
+                </div>
+
+                <div onclick="loginAs('Petr')" class="admin-card relative group cursor-pointer overflow-hidden flex flex-col justify-end p-4 md:p-6">
+                    <img src="./photos/4.webp" class="absolute inset-0 w-full h-full object-cover grayscale opacity-40 group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div class="relative z-10">
+                        <span class="text-[9px] md:text-[10px] font-heading font-bold text-white uppercase tracking-[0.2em] border border-white/30 px-2 py-1 mb-3 inline-block">Barber</span>
+                        <h2 class="text-2xl md:text-4xl font-heading font-bold uppercase tracking-tight">Petr</h2>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD (Obrazovka 2) -->
+    <div id="dashboard-screen" class="hidden-view relative z-10 min-h-screen flex flex-col lg:flex-row">
+        
+        <!-- Boční / Horní Navigace -->
+        <aside class="w-full lg:w-72 bg-black border-b lg:border-b-0 lg:border-r border-border flex flex-col">
+            <!-- Header s profilem -->
+            <div class="p-6 border-b border-border flex items-center justify-between lg:block">
+                <div>
+                    <p class="text-[10px] text-muted font-heading uppercase tracking-[0.2em] mb-1">Přihlášen jako</p>
+                    <h2 id="active-user-name" class="text-2xl font-heading font-bold uppercase tracking-tight text-white">David</h2>
+                </div>
+                <button onclick="logout()" class="lg:mt-6 text-[10px] font-heading font-bold uppercase tracking-[0.2em] border border-border px-3 py-2 hover:bg-white hover:text-black transition-colors">
+                    Odhlásit
+                </button>
+            </div>
+
+            <!-- Menu linky -->
+            <nav class="flex-1 overflow-x-auto lg:overflow-x-hidden flex lg:flex-col py-4 lg:py-6">
+                <button onclick="switchTab('tab-vyrizeni')" id="nav-vyrizeni" class="nav-btn active flex-shrink-0 text-left px-6 py-4 text-muted hover:text-white flex items-center gap-3">
+                    <i data-lucide="inbox" class="w-4 h-4"></i>
+                    <span class="text-xs font-heading font-bold uppercase tracking-widest">K Vyřízení</span>
+                    <span class="ml-auto bg-white text-black text-[9px] px-1.5 py-0.5 font-bold">3</span>
+                </button>
+                <button onclick="switchTab('tab-prehled')" id="nav-prehled" class="nav-btn flex-shrink-0 text-left px-6 py-4 text-muted hover:text-white flex items-center gap-3">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span class="text-xs font-heading font-bold uppercase tracking-widest">Přehled</span>
+                </button>
+                <button onclick="switchTab('tab-platby')" id="nav-platby" class="nav-btn flex-shrink-0 text-left px-6 py-4 text-muted hover:text-white flex items-center gap-3">
+                    <i data-lucide="credit-card" class="w-4 h-4"></i>
+                    <span class="text-xs font-heading font-bold uppercase tracking-widest">Platby</span>
+                </button>
+                <button onclick="switchTab('tab-terminy')" id="nav-terminy" class="nav-btn flex-shrink-0 text-left px-6 py-4 text-muted hover:text-white flex items-center gap-3">
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                    <span class="text-xs font-heading font-bold uppercase tracking-widest">Dostupnost</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Hlavní obsah -->
+        <main class="flex-1 bg-transparent p-4 sm:p-8 lg:p-12 overflow-y-auto h-screen">
+            
+            <!-- ZÁLOŽKA: K VYŘÍZENÍ -->
+            <div id="tab-vyrizeni" class="tab-content animate-in fade-in duration-300">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-heading font-bold uppercase tracking-tighter text-white">Nové Žádosti</h2>
+                    <p class="text-xs text-muted font-heading uppercase tracking-widest mt-2">Čekající na vaše schválení</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Karta rezervace -->
+                    <div id="req-1" class="admin-card p-5 md:p-6 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+                        <div class="flex gap-6 items-center">
+                            <div class="w-12 h-12 bg-white text-black flex flex-col items-center justify-center">
+                                <span class="font-heading font-bold text-lg leading-none">14</span>
+                                <span class="text-[9px] font-heading uppercase font-bold">Zář</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-heading font-bold uppercase tracking-tight text-white">Jan Novák</h3>
+                                <p class="text-xs text-muted font-sans mt-1">Klasický střih • 14:30 - 15:15</p>
+                                <p class="text-xs text-zinc-500 font-sans mt-1"><i data-lucide="phone" class="w-3 h-3 inline mr-1"></i> +420 777 123 456</p>
+                            </div>
+                        </div>
+                        <div class="flex w-full md:w-auto gap-3">
+                            <button onclick="resolveRequest('req-1')" class="flex-1 md:flex-none border border-border hover:border-red-500 hover:text-red-500 text-muted px-6 py-3 text-xs font-heading font-bold uppercase tracking-widest transition-colors">
+                                Zamítnout
+                            </button>
+                            <button onclick="resolveRequest('req-1')" class="flex-1 md:flex-none bg-white hover:bg-zinc-200 text-black px-6 py-3 text-xs font-heading font-bold uppercase tracking-widest transition-colors shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                Potvrdit
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Karta rezervace -->
+                    <div id="req-2" class="admin-card p-5 md:p-6 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+                        <div class="flex gap-6 items-center">
+                            <div class="w-12 h-12 bg-white text-black flex flex-col items-center justify-center">
+                                <span class="font-heading font-bold text-lg leading-none">15</span>
+                                <span class="text-[9px] font-heading uppercase font-bold">Zář</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-heading font-bold uppercase tracking-tight text-white">Michal Kovář</h3>
+                                <p class="text-xs text-muted font-sans mt-1">Střih & Vousy • 09:00 - 10:15</p>
+                                <p class="text-xs text-zinc-500 font-sans mt-1"><i data-lucide="phone" class="w-3 h-3 inline mr-1"></i> +420 606 987 654</p>
+                            </div>
+                        </div>
+                        <div class="flex w-full md:w-auto gap-3">
+                            <button onclick="resolveRequest('req-2')" class="flex-1 md:flex-none border border-border hover:border-red-500 hover:text-red-500 text-muted px-6 py-3 text-xs font-heading font-bold uppercase tracking-widest transition-colors">
+                                Zamítnout
+                            </button>
+                            <button onclick="resolveRequest('req-2')" class="flex-1 md:flex-none bg-white hover:bg-zinc-200 text-black px-6 py-3 text-xs font-heading font-bold uppercase tracking-widest transition-colors shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                Potvrdit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ZÁLOŽKA: PŘEHLED -->
+            <div id="tab-prehled" class="tab-content hidden-view animate-in fade-in duration-300">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-heading font-bold uppercase tracking-tighter text-white">Přehled Termínů</h2>
+                        <p class="text-xs text-muted font-heading uppercase tracking-widest mt-2">Vaše potvrzené rezervace</p>
+                    </div>
+                    <input type="date" class="bg-[#050505] border border-border px-4 py-2 text-sm text-white font-sans focus:outline-none focus:border-white">
+                </div>
+
+                <div class="admin-card overflow-hidden">
+                    <div class="grid grid-cols-1 divide-y divide-border">
+                        
+                        <!-- Potvrzená karta -->
+                        <div class="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-white/5 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <span class="text-lg font-heading font-bold text-white w-16">09:00</span>
+                                <div class="w-1 h-12 bg-white"></div>
+                                <div>
+                                    <h4 class="font-bold text-white uppercase text-sm">Lukáš Dvořák</h4>
+                                    <p class="text-xs text-muted">Holení břitvou</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <span class="text-xs font-bold text-green-500 uppercase tracking-widest border border-green-500/30 bg-green-500/10 px-2 py-1">Potvrzeno</span>
+                                <button class="ml-auto text-[10px] uppercase tracking-widest font-heading font-bold text-muted hover:text-white underline underline-offset-4">Upravit</button>
+                            </div>
+                        </div>
+
+                        <!-- Potvrzená karta -->
+                        <div class="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-white/5 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <span class="text-lg font-heading font-bold text-white w-16">10:30</span>
+                                <div class="w-1 h-12 bg-white"></div>
+                                <div>
+                                    <h4 class="font-bold text-white uppercase text-sm">Petr Svoboda</h4>
+                                    <p class="text-xs text-muted">Klasický střih</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <span class="text-xs font-bold text-green-500 uppercase tracking-widest border border-green-500/30 bg-green-500/10 px-2 py-1">Potvrzeno</span>
+                                <button class="ml-auto text-[10px] uppercase tracking-widest font-heading font-bold text-muted hover:text-white underline underline-offset-4">Upravit</button>
+                            </div>
+                        </div>
+
+                        <!-- Volný slot -->
+                        <div class="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#0a0a0a]">
+                            <div class="flex items-center gap-4">
+                                <span class="text-lg font-heading font-bold text-muted w-16">11:30</span>
+                                <div class="w-1 h-12 bg-border"></div>
+                                <div>
+                                    <h4 class="font-bold text-muted uppercase text-sm">Volný termín</h4>
+                                </div>
+                            </div>
+                            <button class="w-full md:w-auto border border-border px-4 py-2 text-[10px] uppercase tracking-widest font-heading font-bold text-muted hover:text-white hover:border-white transition-colors">
+                                Přidat ručně
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ZÁLOŽKA: PLATBY -->
+            <div id="tab-platby" class="tab-content hidden-view animate-in fade-in duration-300">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-heading font-bold uppercase tracking-tighter text-white">Pokladna</h2>
+                    <p class="text-xs text-muted font-heading uppercase tracking-widest mt-2">Dnešní tržby a vyúčtování</p>
+                </div>
+
+                <!-- Celkový stav -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="admin-card p-8">
+                        <p class="text-xs font-heading font-bold uppercase tracking-widest text-muted mb-2">Dnešní Tržba</p>
+                        <p class="text-5xl font-heading font-bold text-white tracking-tighter">4 260 Kč</p>
+                    </div>
+                    <div class="admin-card p-8">
+                        <p class="text-xs font-heading font-bold uppercase tracking-widest text-muted mb-2">Zbývá vybrat</p>
+                        <p class="text-5xl font-heading font-bold text-muted tracking-tighter">1 480 Kč</p>
+                    </div>
+                </div>
+
+                <h3 class="text-xs font-heading font-bold uppercase tracking-widest text-muted mb-4 border-b border-border pb-2">K úhradě</h3>
+                
+                <div class="space-y-4">
+                    <div id="pay-1" class="admin-card p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="w-full md:w-auto">
+                            <h4 class="text-lg font-heading font-bold uppercase text-white">Lukáš Dvořák</h4>
+                            <p class="text-xs text-muted">Holení břitvou • Provedeno v 09:00</p>
+                        </div>
+                        <div class="flex items-center w-full md:w-auto justify-between md:justify-end gap-6">
+                            <span class="text-xl font-heading font-bold text-white">450 Kč</span>
+                            <button onclick="markAsPaid('pay-1')" class="bg-white text-black px-6 py-2 text-[10px] font-heading font-bold uppercase tracking-[0.2em] hover:bg-zinc-200 transition-colors">
+                                Zaplaceno
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="pay-2" class="admin-card p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="w-full md:w-auto">
+                            <h4 class="text-lg font-heading font-bold uppercase text-white">Petr Svoboda</h4>
+                            <p class="text-xs text-muted">Klasický střih • Provedeno v 10:30</p>
+                        </div>
+                        <div class="flex items-center w-full md:w-auto justify-between md:justify-end gap-6">
+                            <span class="text-xl font-heading font-bold text-white">590 Kč</span>
+                            <button onclick="markAsPaid('pay-2')" class="bg-white text-black px-6 py-2 text-[10px] font-heading font-bold uppercase tracking-[0.2em] hover:bg-zinc-200 transition-colors">
+                                Zaplaceno
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ZÁLOŽKA: DOSTUPNOST -->
+            <div id="tab-terminy" class="tab-content hidden-view animate-in fade-in duration-300">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-heading font-bold uppercase tracking-tighter text-white">Pracovní Doba</h2>
+                        <p class="text-xs text-muted font-heading uppercase tracking-widest mt-2">Nastavení rezervačních bloků</p>
+                    </div>
+                    <button class="bg-white text-black px-6 py-3 text-xs font-heading font-bold uppercase tracking-widest hover:bg-zinc-200 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                        Uložit Změny
+                    </button>
+                </div>
+
+                <div class="admin-card p-6 md:p-8">
+                    <div class="space-y-6">
+                        
+                        <!-- Den -->
+                        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-10 pb-6 border-b border-border">
+                            <div class="flex items-center gap-4 w-32">
+                                <input type="checkbox" checked class="w-4 h-4 accent-white bg-black border-border">
+                                <span class="font-heading font-bold uppercase tracking-widest text-white">Pondělí</span>
+                            </div>
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <input type="time" value="09:00" class="bg-[#050505] border border-border px-3 py-2 text-sm text-white font-sans focus:outline-none focus:border-white">
+                                <span class="text-muted">-</span>
+                                <input type="time" value="18:00" class="bg-[#050505] border border-border px-3 py-2 text-sm text-white font-sans focus:outline-none focus:border-white">
+                            </div>
+                        </div>
+
+                        <!-- Den -->
+                        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-10 pb-6 border-b border-border">
+                            <div class="flex items-center gap-4 w-32">
+                                <input type="checkbox" checked class="w-4 h-4 accent-white bg-black border-border">
+                                <span class="font-heading font-bold uppercase tracking-widest text-white">Úterý</span>
+                            </div>
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <input type="time" value="09:00" class="bg-[#050505] border border-border px-3 py-2 text-sm text-white font-sans focus:outline-none focus:border-white">
+                                <span class="text-muted">-</span>
+                                <input type="time" value="18:00" class="bg-[#050505] border border-border px-3 py-2 text-sm text-white font-sans focus:outline-none focus:border-white">
+                            </div>
+                        </div>
+
+                        <!-- Den OFF -->
+                        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-10 pb-6 border-b border-border opacity-50">
+                            <div class="flex items-center gap-4 w-32">
+                                <input type="checkbox" class="w-4 h-4 accent-white bg-black border-border">
+                                <span class="font-heading font-bold uppercase tracking-widest text-white">Středa</span>
+                            </div>
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <span class="text-xs font-heading font-bold text-muted uppercase tracking-widest border border-border px-4 py-2">Volno (Nepracuje)</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Přihlášení / Výběr Barbera
+        function loginAs(name) {
+            document.getElementById('selection-screen').classList.add('hidden-view');
+            document.getElementById('dashboard-screen').classList.remove('hidden-view');
+            document.getElementById('active-user-name').innerText = name;
+        }
+
+        // 2. Odhlášení
+        function logout() {
+            document.getElementById('dashboard-screen').classList.add('hidden-view');
+            document.getElementById('selection-screen').classList.remove('hidden-view');
+            // Reset tab
+            switchTab('tab-vyrizeni');
+        }
+
+        // 3. Přepínání záložek v Dashboardu
+        function switchTab(tabId) {
+            // Skrýt všechny sekce
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden-view');
+            });
+            // Odoznačit tlačítka v menu
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Zobrazit požadovanou
+            document.getElementById(tabId).classList.remove('hidden-view');
+            
+            // Aktivovat odpovídající tlačítko
+            const navId = 'nav-' + tabId.split('-')[1];
+            document.getElementById(navId).classList.add('active');
+        }
+
+        // 4. Simulace potvrzení/zamítnutí rezervace
+        function resolveRequest(id) {
+            const card = document.getElementById(id);
+            card.style.opacity = '0.5';
+            card.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                card.remove();
+            }, 300);
+        }
+
+        // 5. Simulace "Zaplaceno"
+        function markAsPaid(id) {
+            const card = document.getElementById(id);
+            const btn = card.querySelector('button');
+            btn.innerText = 'Vyřízeno';
+            btn.classList.remove('bg-white', 'text-black', 'hover:bg-zinc-200');
+            btn.classList.add('bg-transparent', 'border', 'border-green-500', 'text-green-500', 'cursor-default');
+            btn.disabled = true;
+            card.classList.add('opacity-50');
+        }
+    </script>
+</body>
+</html>
